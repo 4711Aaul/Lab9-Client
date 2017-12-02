@@ -15,23 +15,12 @@
  * Modified to use REST client to get port data from our server.
  */
 define('REST_SERVER', 'http://backend.local');  // the REST server host
-define('REST_PORT', $_SERVER['80']);   // the port you are running the server on
+define('REST_PORT', $_SERVER['SERVER_PORT']);   // the port you are running the server on
 
-class Tasks extends CI_Model {
+class Tasks extends Memory_Model {
 
     public function __construct() {
         parent::__construct();
-    }
-
-    /**
-     * Returns all the ports from the REST server
-     * @return the ports
-     */
-    function getPorts() {
-        $this->rest->initialize(array('server' => REST_SERVER));
-        $this->rest->option(CURLOPT_PORT, REST_PORT);
-        $result = $this->rest->get('ports');
-        return $result;
     }
 
     function getCategorizedTasks() {
@@ -77,9 +66,7 @@ class Tasks extends CI_Model {
     // Retrieve an existing DB record as an object
     function get($key, $key2 = null) {
         $this->rest->initialize(array('server' => REST_SERVER));
-        $this->rest->option(
-                CURLOPT_PORT, 
-                REST_PORT);
+        $this->rest->option(CURLOPT_PORT, REST_PORT);
         return $this->rest->get('job/' . $key);
     }
 
