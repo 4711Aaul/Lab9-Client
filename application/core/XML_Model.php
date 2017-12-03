@@ -31,7 +31,7 @@ class XML_Model extends Memory_Model {
 
         // start with an empty collection
         $this->_data = array(); // an array of objects
-        $this->fields = array(); // an array of strings
+        //$this->fields = array(); // an array of strings
         // and populate the collection
         $this->load();
     }
@@ -40,48 +40,15 @@ class XML_Model extends Memory_Model {
      * Load the collection state appropriately, depending on persistence choice.
      * OVER-RIDE THIS METHOD in persistence choice implementations
      */
+    
     protected function load() {
-        $xml = simplexml_load_file($this->_origin);
-        
-        foreach ($xml->children() as $child) {
-            $attributes = $child->attributes();
+        // load our data from the REST backend
+        $this->rest->initialize(array('server' => REST_SERVER));
+        $this->rest->option(CURLOPT_PORT, REST_PORT);
+        $this->_data = $this->rest->get('job');
 
-            $record = new stdClass();
-            $record->{"priority"} = $this->validate(intval($attributes['priority']));
-            $record->{"size"} = $this->validate(intval($attributes['size']));
-            $record->{"group"} = $this->validate(intval($attributes['group']));
-            $record->{"deadline"} = $attributes['deadline'];
-            $record->{"status"} = $this->validate(intval($attributes['status']));
-            $record->{"flag"} = $this->validate(intval($attributes['flag']));
-            $record->{"id"} = $this->validate(intval($attributes['id']));
-            $record->{"task"} = (string) $child;
-            
-            $key = $record->id;
-            $this->_data[$key] = $record;
-        }
-        foreach((array)$record as $key=>$val)
-            $this->_fields[] = $key;
-        
+        // rebuild the keys table
         $this->reindex();
-    }
-
-    /**
-     * Store the collection state appropriately, depending on persistence choice.
-     * OVER-RIDE THIS METHOD in persistence choice implementations
-     */
-    protected function store() {
-        $xmlstr = '<?xml version="1.0" encoding="UTF-8"?> <tasks></tasks>';
-        $xml = new SimpleXMLElement($xmlstr);
-        
-        foreach($this->_data as $id=>$object){
-            $xmlelem = $xml->addChild('task', $object->task);
-            foreach((array)$object as $field=>$contents){
-            if (!($field === "task" || $field === "submit")) {
-                    $xmlelem->addAttribute($field, $contents);
-                }
-            }
-        }
-        $xml -> asXML($this->_origin);
     }
         
     private function validate($num)

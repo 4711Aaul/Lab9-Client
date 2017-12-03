@@ -11,10 +11,16 @@
  *
  * @author Paul
  */
+/**
+ * Modified to use REST client to get port data from our server.
+ */
+define('REST_SERVER', 'http://backend.local');  // the REST server host
+define('REST_PORT', $_SERVER['SERVER_PORT']);   // the port you are running the server on
+
 class Tasks extends XML_Model {
 
     public function __construct() {
-        parent::__construct(APPPATH . '../data/tasks.xml', 'id');
+         parent::__construct(APPPATH . '', 'id', 'task');
     }
 
     function getCategorizedTasks() {
@@ -40,6 +46,10 @@ class Tasks extends XML_Model {
         return $converted;
     }
 
+    protected function store() {
+        
+    }
+
     // provide form validation rules
     public function rules() {
         $config = array(
@@ -50,6 +60,10 @@ class Tasks extends XML_Model {
         );
         return $config;
     }
+
+
+
+
 
 }
 
