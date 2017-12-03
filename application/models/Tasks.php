@@ -17,7 +17,7 @@
 define('REST_SERVER', 'http://backend.local');  // the REST server host
 define('REST_PORT', $_SERVER['SERVER_PORT']);   // the port you are running the server on
 
-class Tasks extends Memory_Model {
+class Tasks extends XML_Model {
 
     public function __construct() {
         parent::__construct();
