@@ -124,41 +124,38 @@ class Memory_Model extends CI_Model implements DataMapper {
         return $object;
     }
 
-    // Add a record to the collection
+
+    // Add a record to the DB
     function add($record) {
-        // convert object from associative array, if needed
-        $record = (is_array($record)) ? (object) $record : $record;
-
-        // update the DB table appropriately
+        $this->rest->initialize(array('server' => REST_SERVER));
+        $this->rest->option(CURLOPT_PORT, REST_PORT);
         $key = $record->{$this->_keyfield};
-        $this->_data[$key] = $record;
-
-        $this->store();
+        $retrieved = $this->rest->post('job/' . $key, $record);
+        $this->load(); // because the "database" might have changed
     }
 
-    // Retrieve an existing collection record as an object
+    // Retrieve an existing DB record as an object
     function get($key, $key2 = null) {
-        return (isset($this->_data[$key])) ? $this->_data[$key] : null;
+        $this->rest->initialize(array('server' => REST_SERVER));
+        $this->rest->option(CURLOPT_PORT, REST_PORT);
+        return $this->rest->get('job/' . $key);
     }
 
-    // Update a record in the collection
+    // Update a record in the DB
     function update($record) {
-        // convert object from associative array, if needed
-        $record = (is_array($record)) ? (object) $record : $record;
-        // update the collection appropriately
+        $this->rest->initialize(array('server' => REST_SERVER));
+        $this->rest->option(CURLOPT_PORT, REST_PORT);
         $key = $record->{$this->_keyfield};
-        if (isset($this->_data[$key])) {
-            $this->_data[$key] = $record;
-            $this->store();
-        }
+        $retrieved = $this->rest->put('job/' . $key, $record);
+        $this->load(); // because the "database" might have changed
     }
 
     // Delete a record from the DB
     function delete($key, $key2 = null) {
-        if (isset($this->_data[$key])) {
-            unset($this->_data[$key]);
-            $this->store();
-        }
+        $this->rest->initialize(array('server' => REST_SERVER));
+        $this->rest->option(CURLOPT_PORT, REST_PORT);
+        $this->rest->delete('job/' . $key);
+        $this->load(); // because the "database" might have changed
     }
 
     // Determine if a key exists
